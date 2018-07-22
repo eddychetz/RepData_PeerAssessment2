@@ -1,6 +1,6 @@
 Reproducible Research: Peer Assessment 2
 ==========================================
-krishna acharya
+Eddwin Cheteni
 
 ## Impact of Severe Weather Events on Public Health and Economy in the United States
 
@@ -24,32 +24,32 @@ setwd("~/Desktop/Online Coursera/Coursera-Reproducible-Research/RepData_PeerAsse
 
 if (!"stormData.csv.bz2" %in% dir("./data/")) {
     print("hhhh")
-    download.file("http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", destfile = "data/stormData.csv.bz2")
+    download.file("http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", destfile = "data/FstormData.csv.bz2")
     bunzip2("data/stormData.csv.bz2", overwrite=T, remove=F)
 }
 
 ```
 Then, we read the generated csv file. If the data already exists in the working environment, we do not need to load it again. Otherwise, we read the csv file.
 ```{r}
-if (!"stormData" %in% ls()) {
-    stormData <- read.csv("data/stormData.csv", sep = ",")
+if (!"FstormData" %in% ls()) {
+    FstormData <- read.csv("data/FstormData.csv", sep = ",")
 }
-dim(stormData)
-head(stormData, n = 2)
+dim(FstormData)
+head(FstormData, n = 2)
 ```
 There are 902297 rows and 37 columns in total.
 The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to a lack of good records. More recent years should be considered more complete.
 
 ```{r}
 if (dim(stormData)[2] == 37) {
-    stormData$year <- as.numeric(format(as.Date(stormData$BGN_DATE, format = "%m/%d/%Y %H:%M:%S"), "%Y"))
+    FstormData$year <- as.numeric(format(as.Date(FstormData$BGN_DATE, format = "%m/%d/%Y %H:%M:%S"), "%Y"))
 }
-hist(stormData$year, breaks = 30)
+hist(FstormData$year, breaks = 30)
 ```  
 
 Based on the above histogram, we see that the number of events tracked starts to significantly increase around 1995. So, we use the subset of the data from 1990 to 2011 to get most out of good records.
 ```{r}
-storm <- stormData[stormData$year >= 1995, ]
+storm <- FstormData[FstormData$year >= 1995, ]
 dim(storm)
 ```
 Now, there are 681500 rows and 38 columns in total.
@@ -57,7 +57,7 @@ Now, there are 681500 rows and 38 columns in total.
 #### Impact on Public Health
 In this section, we check the number of **fatalities** and **injuries** that are caused by the severe weather events. We would like to get the first 15 most severe types of weather events.
 ```{r}
-sortHelper <- function(fieldName, top = 15, dataset = stormData) {
+sortHelper <- function(fieldName, top = 15, dataset = FstormData) {
     index <- which(colnames(dataset) == fieldName)
     field <- aggregate(dataset[, index], by = list(dataset$EVTYPE), FUN = "sum")
     names(field) <- c("EVTYPE", fieldName)
